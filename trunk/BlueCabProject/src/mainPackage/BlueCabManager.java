@@ -1,4 +1,8 @@
 package mainPackage;
+
+import BlueCabRequester.CabRequester;
+import BlueCabServiceProvider.CabProvider;
+
 /**
  * 
  */
@@ -14,7 +18,10 @@ public class BlueCabManager {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		CabRequester cr=new CabRequester();
+		cr.createconnection();
+		CabProvider cp=new CabProvider();
+		cp.acceptconnections();
 	}
 
 }
