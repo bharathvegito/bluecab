@@ -1,9 +1,7 @@
-/**
- * 
- */
 package BlueCabServiceProvider;
 
 import java.io.DataInputStream;
+import java.io.IOException;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DeviceClass;
@@ -18,24 +16,26 @@ import javax.microedition.io.StreamConnection;
 import javax.microedition.io.StreamConnectionNotifier;
 
 /**
- * @author GAMEBOY
- *
+ * @author Sharath
+ * @description
  */
 public class CabProvider implements DiscoveryListener {
-	
-	UUID uuid = new UUID(0x0009);
-	StreamConnectionNotifier connection; 
+	UUID uuid = new UUID(0x0003);
+	// Use RFCOM protocol
+	StreamConnectionNotifier connection;
 
-	public CabProvider() {
-
-		try {
-			LocalDevice localDevice = LocalDevice.getLocalDevice();
-			localDevice.setDiscoverable(DiscoveryAgent.GIAC);
-		} catch (BluetoothStateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public CabProvider() throws BluetoothStateException {
+		LocalDevice localDevice = LocalDevice.getLocalDevice();
+		// Local device object for localhost
+		if (localDevice == null) {
+			System.out.println("No local Device Found");
+			System.exit(1);
 		}
+		System.out
+				.println("Local Device found" + localDevice.getFriendlyName());
 
+		localDevice.setDiscoverable(DiscoveryAgent.GIAC);
+		// Set device to be visible to all
 	}
 
 	public void deviceDiscovered(RemoteDevice arg0, DeviceClass arg1) {
@@ -57,17 +57,20 @@ public class CabProvider implements DiscoveryListener {
 		// TODO Auto-generated method stub
 
 	}
-	public void acceptconnections()
-	{
-		try{
-			connection = (StreamConnectionNotifier)Connector.open("btspp://localhost:"+uuid+";name=CabProvider;authorize=false");
-			StreamConnection conn = connection.acceptAndOpen();
-			DataInputStream in = conn.openDataInputStream();
-		}
-		catch(Exception e)
-		{
-				e.printStackTrace();
+
+	public void acceptconnections() {
+		try {
+			connection = (StreamConnectionNotifier) Connector
+					.open("btspp://localhost:" + uuid
+							+ ";name=CabProvider;authorize=false");
+			System.out.println("URL resolved");
+			StreamConnection connToRequestor = connection.acceptAndOpen();
+			System.out.println("Connected to " + connToRequestor.toString());
+			DataInputStream recvMsg = connToRequestor.openDataInputStream();
+			System.out.println("Message recieved : " + recvMsg.readUTF());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
-	
+
 }
