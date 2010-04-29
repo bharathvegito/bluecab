@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="res"/>
+	<classpathentry kind="lib" path="libs/bluecove-2.1.0.jar"/>
 	<classpathentry kind="lib" path="libs/cldcapi11.jar"/>
 	<classpathentry kind="lib" path="libs/j2me-ws.jar"/>
 	<classpathentry kind="lib" path="libs/j2me-xmlrpc.jar"/>
