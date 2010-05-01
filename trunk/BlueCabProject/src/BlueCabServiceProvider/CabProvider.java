@@ -24,18 +24,23 @@ public class CabProvider implements DiscoveryListener {
 	// Use RFCOM protocol
 	StreamConnectionNotifier connection;
 
-	public CabProvider() throws BluetoothStateException {
+	public CabProvider() {
+		try{
 		LocalDevice localDevice = LocalDevice.getLocalDevice();
 		// Local device object for localhost
 		if (localDevice == null) {
 			System.out.println("No local Device Found");
-			System.exit(1);
 		}
 		System.out
 				.println("Local Device found" + localDevice.getFriendlyName());
 
 		localDevice.setDiscoverable(DiscoveryAgent.GIAC);
-		// Set device to be visible to all
+		// Set device to be visible to all}
+		}
+		catch (BluetoothStateException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 
 	public void deviceDiscovered(RemoteDevice arg0, DeviceClass arg1) {
