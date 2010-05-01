@@ -21,32 +21,12 @@ import javax.microedition.io.StreamConnection;
 public class CabRequester implements DiscoveryListener {
 	private RemoteDevice remoteDevice;
 	private ServiceRecord service;
-
-	public CabRequester() throws BluetoothStateException {
-		LocalDevice localDevice = LocalDevice.getLocalDevice();
-		// Local device object for localhost
-		if (localDevice == null) {
-			System.out.println("No local Device Found");
-			System.exit(1);
-		}
-		System.out
-				.println("Local Device found" + localDevice.getFriendlyName());
-
-		DiscoveryAgent disAgent = localDevice.getDiscoveryAgent();
-		// object that does services search after getting a device
-		// For each device found get all its services providable by it
-		disAgent.startInquiry(DiscoveryAgent.GIAC, this);
-		// start enquiry for device(s)
-		UUID uuid = new UUID(0x0003);
-		// uuid is array for set of protocols, we need only RFCOM for
-		// passing msges
-		disAgent.searchServices(new int[] { 0x0100 }, new UUID[] { uuid },
-				remoteDevice, this);
-		// Search for the service offered by the remote device
-	}
-
+	boolean disccom=true;
+	boolean connect=false;
 	public void deviceDiscovered(RemoteDevice rdDiscovered, DeviceClass arg1) {
 		try {
+			System.out.println("Device discovered called");
+			remoteDevice=rdDiscovered;
 			System.out.println("Remote device discovered"
 					+ rdDiscovered.getFriendlyName(true));
 		} catch (IOException e) {
@@ -54,11 +34,11 @@ public class CabRequester implements DiscoveryListener {
 		}
 		remoteDevice = rdDiscovered;
 	}
-
 	public void inquiryCompleted(int inqueryStatus) {
 		switch (inqueryStatus) {
 		case INQUIRY_COMPLETED:
 			System.out.println("All nearby devices has been detected");
+			connect=true;
 			break;
 		case INQUIRY_ERROR:
 			System.out.println("Remote Device not found");
@@ -73,6 +53,11 @@ public class CabRequester implements DiscoveryListener {
 				System.out.println("Unknown Error");
 			break;
 		}
+	}
+	public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
+		System.out.println("Services found");
+		service = arg1[0];
+		createconnection();
 	}
 
 	public void serviceSearchCompleted(int transID, int responseCode) {
@@ -91,12 +76,48 @@ public class CabRequester implements DiscoveryListener {
 			break;
 		}
 	}
+	public CabRequester(){
+		
+		LocalDevice localDevice;
+		try {
+			localDevice = LocalDevice.getLocalDevice();
+			// Local device object for localhost
+			if (localDevice == null) {
+				System.out.println("No local Device Found");
+				System.exit(1);
+			}
+			System.out
+					.println("Local Device found" + localDevice.getFriendlyName());
+			localDevice.setDiscoverable(DiscoveryAgent.GIAC);
 
-	public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
-		System.out.println("Services found");
-		service = arg1[0];
-		createconnection();
+			DiscoveryAgent disAgent = localDevice.getDiscoveryAgent();
+			System.out.println("DiscoveryAgent obtained");
+			// object that does services search after getting a device
+			// For each device found get all its services providable by it
+			disAgent.startInquiry(DiscoveryAgent.GIAC, this);
+			System.out.println("Device Inquiry started");
+			// start enquiry for device(s)
+			UUID uuid = new UUID(0x0003);
+			// uuid is array for set of protocols, we need only RFCOM for
+			// passing msges
+			System.out.println("UUID Initialized");
+			while(disccom)
+			{}
+			if(connect=true)
+			{
+			disAgent.searchServices(new int[]{0x0100}, new UUID[]{uuid},
+					remoteDevice, this);
+			// Search for the service offered by the remote device
+			System.out.println("Service search started");
+			}
+		} catch (BluetoothStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
+
 
 	public void createconnection() {
 		try {
