@@ -1,8 +1,6 @@
 package BlueCabRequester;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
-
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
@@ -16,38 +14,35 @@ import javax.microedition.io.StreamConnection;
 
 /**
  * @author Rohit
- * @description
  */
 public class CabRequester implements DiscoveryListener {
-	private RemoteDevice remoteDevice;
-	private ServiceRecord service;
+	private RemoteDevice remoteDevice = null;
+	private ServiceRecord service = null;
+	private LocalDevice localDevice = null;
 	private boolean raceControlFlag = false;
 
 	public void deviceDiscovered(RemoteDevice rdDiscovered, DeviceClass arg1) {
-		// try {
-		System.out.println("Device discovered called");
 		remoteDevice = rdDiscovered;
 		System.out
 				.println("Remote device discovered" + rdDiscovered.toString());
 		// + rdDiscovered.getFriendlyName(true));
-		/*
-		 * } catch (IOException e) { e.printStackTrace(); }
-		 */
-		remoteDevice = rdDiscovered;
 	}
 
 	public void inquiryCompleted(int inqueryStatus) {
 		switch (inqueryStatus) {
 		case INQUIRY_COMPLETED:
-			System.out.println("All nearby devices has been detected");
-			raceControlFlag = true;
+			System.out.println("Device Inquery Completed");
+			if (remoteDevice != null)
+				raceControlFlag = true;
+			else
+				System.out.println("No device was found in the inquery");
 			break;
 		case INQUIRY_ERROR:
-			System.out.println("Remote Device not found");
+			System.out.println(" Device Inquery Error");
 			System.exit(INQUIRY_ERROR);
 			break;
 		case INQUIRY_TERMINATED:
-			System.out.println("Enquiry cancelled by user");
+			System.out.println("Device Enquiry cancelled by user");
 			System.exit(INQUIRY_TERMINATED);
 			break;
 		default:
@@ -57,21 +52,22 @@ public class CabRequester implements DiscoveryListener {
 		}
 	}
 
-	public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
-		System.out.println("Services found");
-		service = arg1[0];
-		System.out.println("went to servicesDiscovered");
+	public void servicesDiscovered(int arg0, ServiceRecord[] servicesArray) {
+		service = servicesArray[0];
+		System.out.println("Services found" + service.toString());
 	}
 
 	public void serviceSearchCompleted(int transID, int responseCode) {
 		switch (responseCode) {
 		case SERVICE_SEARCH_COMPLETED:
-			System.out
-					.println("All nearby servies offered by the remote device has been detected");
-			raceControlFlag = true;
+			System.out.println("Servie Search Completed");
+			if (service != null)
+				raceControlFlag = true;
+			else
+				System.out.println("No service was found in the search");
 			break;
 		case SERVICE_SEARCH_ERROR:
-			System.out.println("Could not get services offered");
+			System.out.println("Could not do service search");
 			System.exit(SERVICE_SEARCH_ERROR);
 			break;
 		case SERVICE_SEARCH_TERMINATED:
@@ -83,10 +79,9 @@ public class CabRequester implements DiscoveryListener {
 
 	public CabRequester() {
 
-		LocalDevice localDevice = null;
 		try {
 			if (LocalDevice.isPowerOn() == false) {
-				System.out.println("No local Device Found");
+				System.out.println("No local Bluetooth Device Found");
 				System.exit(1);
 			}
 			localDevice = LocalDevice.getLocalDevice();
@@ -120,10 +115,8 @@ public class CabRequester implements DiscoveryListener {
 				Thread.sleep(5000);
 
 		} catch (BluetoothStateException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -134,10 +127,14 @@ public class CabRequester implements DiscoveryListener {
 					ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
 			// get the url from service retrieved
 			// address, port of the remote device in the url
+			System.out.println("URL broadcasted" + url.toString());
 			StreamConnection connection = (StreamConnection) Connector
 					.open(url);
 			// Open a connection using the url
+			System.out.println("connection to url eshtablished"
+					+ connection.toString());
 			DataOutputStream output = connection.openDataOutputStream();
+			System.out.println("Stream object created" + output.toString());
 			output.writeUTF("Hai .....I am sending a message");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -147,7 +144,7 @@ public class CabRequester implements DiscoveryListener {
 	public void customerContractSetup() {
 		// TODO: Message passing to write
 		// to check it out : Do we have to call setDiscoverable() for cab
-		// requestor
+		// Requester
 	}
 
 }

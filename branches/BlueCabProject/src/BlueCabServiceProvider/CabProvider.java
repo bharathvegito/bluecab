@@ -2,7 +2,6 @@ package BlueCabServiceProvider;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
@@ -17,7 +16,6 @@ import javax.microedition.io.StreamConnectionNotifier;
 
 /**
  * @author Sharath
- * @description
  */
 public class CabProvider implements DiscoveryListener {
 	UUID uuid = new UUID(0x0003);
@@ -42,23 +40,15 @@ public class CabProvider implements DiscoveryListener {
 	}
 
 	public void deviceDiscovered(RemoteDevice arg0, DeviceClass arg1) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void inquiryCompleted(int arg0) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void serviceSearchCompleted(int arg0, int arg1) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public void acceptconnections() {

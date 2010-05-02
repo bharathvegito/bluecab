@@ -5,17 +5,17 @@ import BlueCabServiceProvider.CabProvider;
 
 /**
  * @author Rohit
- * @description
  */
 public class BlueCabManager {
 
 	public static void main(String[] args) {
 
 		CabRequester cr = new CabRequester();
+		System.out.println("CabRequestor objecte created");
 		cr.createconnection();
 
-		CabProvider cp = new CabProvider();
-		cp.acceptconnections();
+		// CabProvider cp = new CabProvider();
+		// cp.acceptconnections();
 
 	}
 }
