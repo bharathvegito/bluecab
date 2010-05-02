@@ -25,19 +25,17 @@ public class CabProvider implements DiscoveryListener {
 	StreamConnectionNotifier connection;
 
 	public CabProvider() {
-		try{
-		LocalDevice localDevice = LocalDevice.getLocalDevice();
-		// Local device object for localhost
-		if (localDevice == null) {
-			System.out.println("No local Device Found");
-		}
-		System.out
-				.println("Local Device found" + localDevice.getFriendlyName());
+		try {
+			LocalDevice localDevice = LocalDevice.getLocalDevice();
+			// Local device object for localhost
 
-		localDevice.setDiscoverable(DiscoveryAgent.GIAC);
-		// Set device to be visible to all}
-		}
-		catch (BluetoothStateException e) {
+			System.out.println("Local Device found" + localDevice.toString()
+					+ localDevice.getFriendlyName());
+
+			localDevice.setDiscoverable(DiscoveryAgent.GIAC);
+			// Set device to be visible to all}
+			System.out.println("Setting Discoverable Flag...Done");
+		} catch (BluetoothStateException e) {
 			// TODO: handle exception
 			e.printStackTrace();
 		}

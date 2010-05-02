@@ -21,24 +21,27 @@ import javax.microedition.io.StreamConnection;
 public class CabRequester implements DiscoveryListener {
 	private RemoteDevice remoteDevice;
 	private ServiceRecord service;
-	boolean disccom=true;
-	boolean connect=false;
+	boolean connect = false;
+
 	public void deviceDiscovered(RemoteDevice rdDiscovered, DeviceClass arg1) {
-		try {
-			System.out.println("Device discovered called");
-			remoteDevice=rdDiscovered;
-			System.out.println("Remote device discovered"
-					+ rdDiscovered.getFriendlyName(true));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// try {
+		System.out.println("Device discovered called");
+		remoteDevice = rdDiscovered;
+		System.out
+				.println("Remote device discovered" + rdDiscovered.toString());
+		// + rdDiscovered.getFriendlyName(true));
+		/*
+		 * } catch (IOException e) { e.printStackTrace(); }
+		 */
 		remoteDevice = rdDiscovered;
 	}
+
 	public void inquiryCompleted(int inqueryStatus) {
 		switch (inqueryStatus) {
 		case INQUIRY_COMPLETED:
 			System.out.println("All nearby devices has been detected");
-			connect=true;
+			connect = true;
+
 			break;
 		case INQUIRY_ERROR:
 			System.out.println("Remote Device not found");
@@ -54,10 +57,11 @@ public class CabRequester implements DiscoveryListener {
 			break;
 		}
 	}
+
 	public void servicesDiscovered(int arg0, ServiceRecord[] arg1) {
 		System.out.println("Services found");
 		service = arg1[0];
-		createconnection();
+		System.out.println("went to servicesDiscovered");
 	}
 
 	public void serviceSearchCompleted(int transID, int responseCode) {
@@ -65,6 +69,8 @@ public class CabRequester implements DiscoveryListener {
 		case SERVICE_SEARCH_COMPLETED:
 			System.out
 					.println("All nearby servies offered by the remote device has been detected");
+			connect = true;
+			createconnection();
 			break;
 		case SERVICE_SEARCH_ERROR:
 			System.out.println("Could not get services offered");
@@ -76,22 +82,23 @@ public class CabRequester implements DiscoveryListener {
 			break;
 		}
 	}
-	public CabRequester(){
-		
-		LocalDevice localDevice;
+
+	public CabRequester() {
+
+		LocalDevice localDevice = null;
 		try {
-			localDevice = LocalDevice.getLocalDevice();
-			// Local device object for localhost
-			if (localDevice == null) {
+			if (LocalDevice.isPowerOn() == false) {
 				System.out.println("No local Device Found");
 				System.exit(1);
 			}
-			System.out
-					.println("Local Device found" + localDevice.getFriendlyName());
+			localDevice = LocalDevice.getLocalDevice();
+			// Local device object for localhost
+			System.out.println("Local Device found" + localDevice.toString()
+					+ localDevice.getFriendlyName());
 			localDevice.setDiscoverable(DiscoveryAgent.GIAC);
-
 			DiscoveryAgent disAgent = localDevice.getDiscoveryAgent();
-			System.out.println("DiscoveryAgent obtained");
+			System.out.println("DiscoveryAgent obtained :"
+					+ disAgent.toString());
 			// object that does services search after getting a device
 			// For each device found get all its services providable by it
 			disAgent.startInquiry(DiscoveryAgent.GIAC, this);
@@ -100,24 +107,28 @@ public class CabRequester implements DiscoveryListener {
 			UUID uuid = new UUID(0x0003);
 			// uuid is array for set of protocols, we need only RFCOM for
 			// passing msges
-			System.out.println("UUID Initialized");
-			while(disccom)
-			{}
-			if(connect=true)
-			{
-			disAgent.searchServices(new int[]{0x0100}, new UUID[]{uuid},
-					remoteDevice, this);
-			// Search for the service offered by the remote device
-			System.out.println("Service search started");
+			System.out.println("UUID Initialized: " + uuid.toString());
+			while (connect == false) {
+				Thread.sleep(5000);
+			}
+			if (connect == true) {
+				disAgent.searchServices(new int[] { 0x0100 },
+						new UUID[] { uuid }, remoteDevice, this);
+				// Search for the service offered by the remote device
+				System.out.println("Service search started");
+				connect = false;
+				while (connect == false) {
+					Thread.sleep(5000);
+				}
 			}
 		} catch (BluetoothStateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		
 	}
-
 
 	public void createconnection() {
 		try {
