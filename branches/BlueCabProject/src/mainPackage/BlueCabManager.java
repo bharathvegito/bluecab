@@ -1,7 +1,5 @@
 package mainPackage;
 
-import javax.bluetooth.BluetoothStateException;
-
 import BlueCabRequester.CabRequester;
 import BlueCabServiceProvider.CabProvider;
 
@@ -11,12 +9,13 @@ import BlueCabServiceProvider.CabProvider;
  */
 public class BlueCabManager {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
-		CabRequester cr = new CabRequester();
-		cr.createconnection();
-				
+		/*
+		 * CabRequester cr = new CabRequester();
+		 */
+		/*
+		 * CabProvider cp = new CabProvider(); cp.acceptconnections();
+		 */
+
 	}
 }
