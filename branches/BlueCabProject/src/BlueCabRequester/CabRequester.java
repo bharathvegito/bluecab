@@ -21,7 +21,7 @@ import javax.microedition.io.StreamConnection;
 public class CabRequester implements DiscoveryListener {
 	private RemoteDevice remoteDevice;
 	private ServiceRecord service;
-	boolean connect = false;
+	private boolean raceControlFlag = false;
 
 	public void deviceDiscovered(RemoteDevice rdDiscovered, DeviceClass arg1) {
 		// try {
@@ -40,8 +40,7 @@ public class CabRequester implements DiscoveryListener {
 		switch (inqueryStatus) {
 		case INQUIRY_COMPLETED:
 			System.out.println("All nearby devices has been detected");
-			connect = true;
-
+			raceControlFlag = true;
 			break;
 		case INQUIRY_ERROR:
 			System.out.println("Remote Device not found");
@@ -69,8 +68,7 @@ public class CabRequester implements DiscoveryListener {
 		case SERVICE_SEARCH_COMPLETED:
 			System.out
 					.println("All nearby servies offered by the remote device has been detected");
-			connect = true;
-			createconnection();
+			raceControlFlag = true;
 			break;
 		case SERVICE_SEARCH_ERROR:
 			System.out.println("Could not get services offered");
@@ -108,19 +106,19 @@ public class CabRequester implements DiscoveryListener {
 			// uuid is array for set of protocols, we need only RFCOM for
 			// passing msges
 			System.out.println("UUID Initialized: " + uuid.toString());
-			while (connect == false) {
+
+			while (raceControlFlag == false)
 				Thread.sleep(5000);
-			}
-			if (connect == true) {
-				disAgent.searchServices(new int[] { 0x0100 },
-						new UUID[] { uuid }, remoteDevice, this);
-				// Search for the service offered by the remote device
-				System.out.println("Service search started");
-				connect = false;
-				while (connect == false) {
-					Thread.sleep(5000);
-				}
-			}
+
+			disAgent.searchServices(new int[] { 0x0100 }, new UUID[] { uuid },
+					remoteDevice, this);
+			// Search for the service offered by the remote device
+			System.out.println("Service search started");
+			raceControlFlag = false;
+
+			while (raceControlFlag == false)
+				Thread.sleep(5000);
+
 		} catch (BluetoothStateException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

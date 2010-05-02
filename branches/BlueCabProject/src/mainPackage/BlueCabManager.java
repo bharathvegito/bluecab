@@ -10,12 +10,12 @@ import BlueCabServiceProvider.CabProvider;
 public class BlueCabManager {
 
 	public static void main(String[] args) {
-		/*
-		 * CabRequester cr = new CabRequester();
-		 */
-		/*
-		 * CabProvider cp = new CabProvider(); cp.acceptconnections();
-		 */
+
+		CabRequester cr = new CabRequester();
+		cr.createconnection();
+
+		CabProvider cp = new CabProvider();
+		cp.acceptconnections();
 
 	}
 }
