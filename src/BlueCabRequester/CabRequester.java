@@ -2,6 +2,7 @@ package BlueCabRequester;
 
 import java.io.DataOutputStream;
 import javax.bluetooth.BluetoothStateException;
+import javax.bluetooth.DataElement;
 import javax.bluetooth.DeviceClass;
 import javax.bluetooth.DiscoveryAgent;
 import javax.bluetooth.DiscoveryListener;
@@ -47,22 +48,32 @@ public class CabRequester implements DiscoveryListener {
 			break;
 		default:
 			if (remoteDevice == null)
-				System.out.println("Unknown Error");
+					System.out.println("Unknown Error");
 			break;
 		}
 	}
 
 	public void servicesDiscovered(int arg0, ServiceRecord[] servicesArray) {
 		service = servicesArray[0];
-		System.out.println("Services found" + service.toString());
+		for (int i = 0; i < servicesArray.length; i++)
+			System.out.println("Service name found "
+					+ servicesArray[i].getAttributeValue(0x0100).toString());
+		for (int i = 0; i < servicesArray.length; i++) {
+			if (servicesArray[i].getAttributeValue(0x0100).toString().compareTo("STRING Serial Port") == 0) {
+				service = servicesArray[i];
+				System.out.println("Services match found "
+						+ service.getAttributeValue(0x0100));
+			}
+		}
 	}
 
 	public void serviceSearchCompleted(int transID, int responseCode) {
 		switch (responseCode) {
 		case SERVICE_SEARCH_COMPLETED:
-			System.out.println("Servie Search Completed");
+			System.out.println("Service Search Completed");
 			if (service != null)
 				raceControlFlag = true;
+
 			else
 				System.out.println("No service was found in the search");
 			break;
@@ -99,7 +110,8 @@ public class CabRequester implements DiscoveryListener {
 			// start enquiry for device(s)
 			UUID uuid = new UUID(0x0003);
 			// uuid is array for set of protocols, we need only RFCOM for
-			// passing msges
+			// passing msges attrID is id of required attribute
+			// in our case we need name
 			System.out.println("UUID Initialized: " + uuid.toString());
 
 			while (raceControlFlag == false)
@@ -127,14 +139,14 @@ public class CabRequester implements DiscoveryListener {
 					ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
 			// get the url from service retrieved
 			// address, port of the remote device in the url
-			System.out.println("URL broadcasted" + url.toString());
+			System.out.println("URL broadcasted " + url.toString());
 			StreamConnection connection = (StreamConnection) Connector
 					.open(url);
 			// Open a connection using the url
-			System.out.println("connection to url eshtablished"
+			System.out.println("connection to url eshtablished "
 					+ connection.toString());
 			DataOutputStream output = connection.openDataOutputStream();
-			System.out.println("Stream object created" + output.toString());
+			System.out.println("Stream object created " + output.toString());
 			output.writeUTF("Hai .....I am sending a message");
 		} catch (Exception e) {
 			e.printStackTrace();
