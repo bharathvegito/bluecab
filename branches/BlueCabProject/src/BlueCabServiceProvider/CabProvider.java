@@ -56,7 +56,8 @@ public class CabProvider implements DiscoveryListener {
 			connection = (StreamConnectionNotifier) Connector
 					.open("btspp://localhost:" + uuid
 							+ ";name=CabProvider;authorize=false");
-			System.out.println("URL resolved");
+			System.out.println("URL " + "btspp://localhost:" + uuid
+				+ ";name=CabProvider;authorize=false" + " resolved");
 			StreamConnection connToRequestor = connection.acceptAndOpen();
 			System.out.println("Connected to " + connToRequestor.toString());
 			DataInputStream recvMsg = connToRequestor.openDataInputStream();
