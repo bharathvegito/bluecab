@@ -14,8 +14,7 @@ public class BlueCabManager {
 		System.out.println("CabRequestor objecte created");
 		cr.createconnection();
 
-		// CabProvider cp = new CabProvider();
-		// cp.acceptconnections();
-
+		//CabProvider cp = new CabProvider();
+		//cp.acceptconnections();
 	}
 }
