@@ -1,6 +1,8 @@
 package BlueCabRequester;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
+
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DataElement;
 import javax.bluetooth.DeviceClass;
@@ -24,8 +26,13 @@ public class CabRequester implements DiscoveryListener {
 
 	public void deviceDiscovered(RemoteDevice rdDiscovered, DeviceClass arg1) {
 		remoteDevice = rdDiscovered;
-		System.out
-				.println("Remote device discovered" + rdDiscovered.toString());
+		try {
+			System.out
+					.println("Remote device discovered " + rdDiscovered.toString() + " " + rdDiscovered.getFriendlyName(true));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// + rdDiscovered.getFriendlyName(true));
 	}
 
@@ -97,7 +104,7 @@ public class CabRequester implements DiscoveryListener {
 			}
 			localDevice = LocalDevice.getLocalDevice();
 			// Local device object for localhost
-			System.out.println("Local Device found" + localDevice.toString()
+			System.out.println("Local Device found " + localDevice.toString()
 					+ localDevice.getFriendlyName());
 			localDevice.setDiscoverable(DiscoveryAgent.GIAC);
 			DiscoveryAgent disAgent = localDevice.getDiscoveryAgent();
@@ -140,12 +147,8 @@ public class CabRequester implements DiscoveryListener {
 			// get the url from service retrieved
 			// address, port of the remote device in the url
 			System.out.println("URL broadcasted " + url.toString());
-			StreamConnection connection = (StreamConnection) Connector
-					.open(url);
-			// Open a connection using the url
-			System.out.println("connection to url eshtablished "
-					+ connection.toString());
-			DataOutputStream output = connection.openDataOutputStream();
+			DataOutputStream output = (DataOutputStream) Connector.openDataOutputStream(url);
+			// Open a connection using the url and open a output stream
 			System.out.println("Stream object created " + output.toString());
 			output.writeUTF("Hai .....I am sending a message");
 		} catch (Exception e) {

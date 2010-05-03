@@ -18,13 +18,14 @@ import javax.microedition.io.StreamConnectionNotifier;
  * @author Sharath
  */
 public class CabProvider implements DiscoveryListener {
-	UUID uuid = new UUID(0x0003);
+	private UUID uuid = new UUID(0x0003);
 	// Use RFCOM protocol
-	StreamConnectionNotifier connection;
+	private StreamConnectionNotifier connection;
+	private LocalDevice localDevice = null;
 
 	public CabProvider() {
 		try {
-			LocalDevice localDevice = LocalDevice.getLocalDevice();
+			localDevice = LocalDevice.getLocalDevice();
 			// Local device object for localhost
 
 			System.out.println("Local Device found" + localDevice.toString()
@@ -53,14 +54,12 @@ public class CabProvider implements DiscoveryListener {
 
 	public void acceptconnections() {
 		try {
-			connection = (StreamConnectionNotifier) Connector
-					.open("btspp://localhost:" + uuid
-							+ ";name=CabProvider;authorize=false");
+			String url = "btspp://localhost:" + uuid
+			+ ";name=CabProvider;authorize=false";
 			System.out.println("URL " + "btspp://localhost:" + uuid
-				+ ";name=CabProvider;authorize=false" + " resolved");
-			StreamConnection connToRequestor = connection.acceptAndOpen();
-			System.out.println("Connected to " + connToRequestor.toString());
-			DataInputStream recvMsg = connToRequestor.openDataInputStream();
+					+ ";name=CabProvider;authorize=false" + " resolved");
+			DataInputStream recvMsg = (DataInputStream) Connector.openInputStream(url);
+			System.out.println("Stream opened " + recvMsg.toString());
 			System.out.println("Message recieved : " + recvMsg.readUTF());
 		} catch (IOException e) {
 			e.printStackTrace();
