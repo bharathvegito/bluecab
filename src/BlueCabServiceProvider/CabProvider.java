@@ -18,10 +18,11 @@ import javax.microedition.io.StreamConnectionNotifier;
  * @author Sharath
  */
 public class CabProvider implements DiscoveryListener {
-	private UUID uuid = new UUID(0x0003);
+	private UUID uuid = new UUID(0x1101);
 	// Use RFCOM protocol
-	private StreamConnectionNotifier connection;
-	private LocalDevice localDevice = null;
+	StreamConnectionNotifier connection;
+	LocalDevice localDevice = null;
+	String baddr;
 
 	public CabProvider() {
 		try {
@@ -33,6 +34,8 @@ public class CabProvider implements DiscoveryListener {
 
 			localDevice.setDiscoverable(DiscoveryAgent.GIAC);
 			// Set device to be visible to all}
+			baddr = localDevice.getBluetoothAddress();
+			System.out.println("Host device addr: " + baddr);
 			System.out.println("Setting Discoverable Flag...Done");
 		} catch (BluetoothStateException e) {
 			// TODO: handle exception
@@ -54,12 +57,15 @@ public class CabProvider implements DiscoveryListener {
 
 	public void acceptconnections() {
 		try {
-			String url = "btspp://localhost:" + uuid
-			+ ";name=CabProvider;authorize=false";
-			System.out.println("URL " + "btspp://localhost:" + uuid
-					+ ";name=CabProvider;authorize=false" + " resolved");
-			DataInputStream recvMsg = (DataInputStream) Connector.openInputStream(url);
-			System.out.println("Stream opened " + recvMsg.toString());
+			String url = "btspp://baddr:" + uuid
+					+ ";name=CabProvider;authorize=false";
+			connection = (StreamConnectionNotifier) Connector
+					.open("btspp://baddr:" + uuid
+							+ ";name=CabProvider;authorize=false");
+			System.out.println("URL resolved");
+			StreamConnection connToRequestor = connection.acceptAndOpen();
+			System.out.println("Connected to " + connToRequestor.toString());
+			DataInputStream recvMsg = connToRequestor.openDataInputStream();
 			System.out.println("Message recieved : " + recvMsg.readUTF());
 		} catch (IOException e) {
 			e.printStackTrace();

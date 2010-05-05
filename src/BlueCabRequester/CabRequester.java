@@ -1,7 +1,10 @@
 package BlueCabRequester;
 
+import gov.nist.siplite.address.Address;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.bluetooth.BluetoothStateException;
 import javax.bluetooth.DataElement;
@@ -19,16 +22,18 @@ import javax.microedition.io.StreamConnection;
  * @author Rohit
  */
 public class CabRequester implements DiscoveryListener {
-	private RemoteDevice remoteDevice = null;
+	private Vector remoteDevices = new Vector();
 	private ServiceRecord service = null;
 	private LocalDevice localDevice = null;
 	private boolean raceControlFlag = false;
+	private RemoteDevice remoteDevice = null;
 
 	public void deviceDiscovered(RemoteDevice rdDiscovered, DeviceClass arg1) {
-		remoteDevice = rdDiscovered;
+		remoteDevices.addElement(rdDiscovered);
 		try {
-			System.out
-					.println("Remote device discovered " + rdDiscovered.toString() + " " + rdDiscovered.getFriendlyName(true));
+			System.out.println("Remote device discovered "
+					+ rdDiscovered.toString() + " "
+					+ rdDiscovered.getFriendlyName(true));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,7 +45,7 @@ public class CabRequester implements DiscoveryListener {
 		switch (inqueryStatus) {
 		case INQUIRY_COMPLETED:
 			System.out.println("Device Inquery Completed");
-			if (remoteDevice != null)
+			if (remoteDevices != null)
 				raceControlFlag = true;
 			else
 				System.out.println("No device was found in the inquery");
@@ -54,8 +59,8 @@ public class CabRequester implements DiscoveryListener {
 			System.exit(INQUIRY_TERMINATED);
 			break;
 		default:
-			if (remoteDevice == null)
-					System.out.println("Unknown Error");
+			if (remoteDevices == null)
+				System.out.println("Unknown Error");
 			break;
 		}
 	}
@@ -66,7 +71,8 @@ public class CabRequester implements DiscoveryListener {
 			System.out.println("Service name found "
 					+ servicesArray[i].getAttributeValue(0x0100).toString());
 		for (int i = 0; i < servicesArray.length; i++) {
-			if (servicesArray[i].getAttributeValue(0x0100).toString().compareTo("STRING Serial Port") == 0) {
+			if (servicesArray[i].getAttributeValue(0x0100).toString()
+					.compareTo("STRING Serial Port") == 0) {
 				service = servicesArray[i];
 				System.out.println("Services match found "
 						+ service.getAttributeValue(0x0100));
@@ -123,16 +129,18 @@ public class CabRequester implements DiscoveryListener {
 
 			while (raceControlFlag == false)
 				Thread.sleep(5000);
+			for (int i = 0; i < remoteDevices.size(); i++) {
 
-			disAgent.searchServices(new int[] { 0x0100 }, new UUID[] { uuid },
-					remoteDevice, this);
-			// Search for the service offered by the remote device
-			System.out.println("Service search started");
-			raceControlFlag = false;
+				remoteDevice = (RemoteDevice) remoteDevices.elementAt(i);
+				disAgent.searchServices(new int[] { 0x0100 },
+						new UUID[] { uuid }, remoteDevice, this);
+				// Search for the service offered by the remote device
+				System.out.println("Service search started");
+				raceControlFlag = false;
 
-			while (raceControlFlag == false)
-				Thread.sleep(5000);
-
+				while (raceControlFlag == false)
+					Thread.sleep(5000);
+			}
 		} catch (BluetoothStateException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -146,11 +154,12 @@ public class CabRequester implements DiscoveryListener {
 					ServiceRecord.NOAUTHENTICATE_NOENCRYPT, false);
 			// get the url from service retrieved
 			// address, port of the remote device in the url
-			System.out.println("URL broadcasted " + url.toString());
-			DataOutputStream output = (DataOutputStream) Connector.openDataOutputStream(url);
-			// Open a connection using the url and open a output stream
-			System.out.println("Stream object created " + output.toString());
+			StreamConnection connection = (StreamConnection) Connector
+					.open(url);
+			// Open a connection using the url
+			DataOutputStream output = connection.openDataOutputStream();
 			output.writeUTF("Hai .....I am sending a message");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
