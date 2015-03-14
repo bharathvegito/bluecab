@@ -1,0 +1,2 @@
+Project consists of 2 modules
+The cab requester module and cab driver module. Requester scans the nearby area for cab drivers and sends them msgs about pickup/destination points. Then, Cab driver acknowledges the request.
